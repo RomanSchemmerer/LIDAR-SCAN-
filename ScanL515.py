@@ -118,16 +118,10 @@ class L515(object):
 
     def get_png(self):
 
-       # if self.open is False:
-
-       #     self.start()
-
         # alignment object, if we want to map color to pointcloud
         align_to = rs.stream.color
         align = rs.align(align_to)  #align-function is super important, otherwise depth and color image do not fit
         #Intel Realsense solution would be a reshape function :'-D, this is not working
-
-        #try:
 
             # Create a pipeline object. This object configures the streaming camera and owns it's handle
         frames = self.pipeline.wait_for_frames()
@@ -135,15 +129,12 @@ class L515(object):
         depth = aligned_frames.get_depth_frame()
         color = aligned_frames.get_color_frame()
         depth_np = np.asanyarray(depth.get_data())
-                #depth_np = np.around(np.multiply(depth_np, 0.25))  #Activate to scale in mm, but image representation gets worse, idk why
+        #depth_np = np.around(np.multiply(depth_np, 0.25))  #Activate to scale in mm, but image representation gets worse, idk why
         color_np = np.asanyarray(color.get_data())         
         
         
         
         return depth_np, color_np
-
-        #finally:
-            #self.pipeline.stop()
 
     def get_ply(self,y): 
         # Declare pointcloud object, for calculating pointclouds and texture mappings
@@ -223,7 +214,6 @@ def main(y):
         depth_jet = cv2.applyColorMap(cv2.convertScaleAbs(dep, alpha=0.03), cv2.COLORMAP_JET)
 
         # Safe the images
-        #cv2.imwrite("LIDAR_Test\Depth_RAW1\DepthSample_RAW2_%d%d.png" %(y,x), dep)
         np.save("LIDAR_Scan6\Depth_RAW\Depth_RAW_%d%d" %(y,x), dep)                 #CHANGE HERE
         np.save("LIDAR_Scan6\Color_RAW\Color_RAW_%d%d" %(y,x), col)                 #CHANGE HERE
         cv2.imwrite("LIDAR_Scan6\Image\Color_%d%d.png" %(y,x), col)                 #CHANGE HERE
@@ -232,15 +222,8 @@ def main(y):
         time.sleep(1) 
 
 
-    #print("depth shape:", dep.shape, "MaxVal:", np.amax(dep))
-    #print("deph_jet shape:", depth_jet.shape, "MaxVal:", np.amax(depth_jet))
-    #print("color shape:", col.shape, "MaxVal:", np.amax(col))
-
-
-
-
 if __name__ == "__main__":
-    for y in range(9, 10, 1):    # when finished 31-60; 61-99
+    for y in range(0, 10, 1):  
 
         main(y) 
         
