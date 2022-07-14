@@ -1,0 +1,51 @@
+# This can be used to convert a RGB and Depth image to a pointcloud in .ply-format
+# This script does not create any meshes, only points
+# for further visualization or else MeshLab is recommended
+import cv2 
+import numpy as np
+import math as m
+
+# Load the RGBD here
+dep= np.load('LIDAR_Data\LIDAR_Scan3\Depth_RAW\Depth_RAW_697.npy')
+col= np.load('LIDAR_Data\LIDAR_Scan3\Color_RAW\Color_RAW_697.npy')
+
+f = open("demofile.ply", "w")
+f.write("ply" + "\n" + "format ascii 1.0"  + "\n" + "comment pointcloud saved from Realsense Viewer"  +
+ "\n" + "element vertex 921600" + "\n" + "property float32 x"  + "\n" + "property float32 y"  + "\n" +
+ "property float32 z" +"\n" + "property uint8 red" + "\n" + "property uint8 green" + 
+ "\n" + "property uchar blue"+"\n"+"end_header"+"\n")
+
+x_ges = 1280  #Set here the resolution of the camera (here a RealSense L515 is used) 
+y_ges = 720   
+x_FOV = 69    #Set here the Field-of-View of the camera (here a RealSense L515 is used) 
+y_FOV = 42
+
+#Cart_Array=np.zeros((720,1280,3))
+
+for y in range(0, y_ges):
+    for x in range(0, x_ges):
+
+        #Change to middle orientated CoSy
+
+        x_new = x-(x_ges/2)
+        y_new = y-(y_ges/2)
+
+        #Cal angel
+        x_alpha = x_new*(x_FOV*2*m.pi/360)/x_ges
+        y_alpha = y_new*(y_FOV*2*m.pi/360)/y_ges
+
+        #Cal planar distance
+        z_real = dep[y][x]*0.25
+        
+        x_real = np.arctan(x_alpha)*z_real
+        y_real = np.arctan(y_alpha)*z_real
+
+        #Write in Array
+        #Cart_Array[y][x][0] = x_real
+        #Cart_Array[y][x][1] = y_real
+        #Cart_Array[y][x][2] = z_real
+
+        #Write to textfile
+        f.write("%d %d %d" %(x_real, y_real, z_real) +"\n" +"%d %d %d" %(col[y][x][0],col[y][x][1],col[y][x][2])+"\n")
+print(Cart_Array.shape)
+f.close()
